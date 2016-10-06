@@ -29,7 +29,8 @@ cmd d f m j s = (s . j . map m . f . d)
 
 -- parse an argument string to determine function
 make_function :: String -> (String -> String)
-make_function "id" = id' 
+make_function "id"      = id'
+make_function "reverse" = reverse'
 
 -- A command that does nothing except resetting columns
 id' :: (String -> String)
@@ -40,6 +41,15 @@ id' = (cmd d f m j s) where
     j = id
     s = concat 
 
+-- reverse each sequence (NOT reverse complement)
+reverse' :: String -> String
+reverse' = (cmd d f m j s) where
+    d = readFasta
+    f = id
+    m = (write . etrans id (qtrans reverse))
+    j = id
+    s = concat
+
 -- ----------- Smof subcommands ----------------------------------------
 -- -- cut emulates UNIX cut command, where fields are entries
 -- cut' :: String -> String
@@ -48,7 +58,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- clean cleans fasta files
 -- clean' :: String -> String
@@ -57,7 +67,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- filter extracts sequences meeting the given conditions
 -- filter' :: String -> String
@@ -66,7 +76,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- grep roughly emulates the UNIX grep command
 -- grep' :: String -> String
@@ -75,7 +85,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- md5sum calculate an md5 checksum for the input sequences
 -- md5sum' :: String -> String
@@ -84,7 +94,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- head writes the first sequences in a file
 -- head' :: String -> String
@@ -93,7 +103,7 @@ id' = (cmd d f m j s) where
 --     f = take 1
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- permute randomly order sequence
 -- permute' :: String -> String
@@ -102,16 +112,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
---
--- -- reverse reverse each sequence (or reverse complement)
--- reverse' :: String -> String
--- reverse' x = (cmd d f m j s) x where
---     d = readFasta
---     f = id
---     m = write
---     j = id
---     s = unlines
+--     s = concat
 --
 -- -- sample randomly select entries from fasta file
 -- sample' :: String -> String
@@ -120,7 +121,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- sniff extract info about the sequence
 -- sniff' :: String -> String
@@ -129,7 +130,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- sort sort sequences
 -- sort' :: String -> String
@@ -138,7 +139,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- split split a fasta file into smaller files
 -- split' :: String -> String
@@ -147,7 +148,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- stat calculate sequence statistics
 -- stat' :: String -> String
@@ -156,7 +157,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- subseq extract subsequence from each entry (revcomp if a<b)
 -- subseq' :: String -> String
@@ -165,7 +166,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- tail writes the last sequences in a file
 -- tail' :: String -> String
@@ -174,7 +175,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- uniq count, omit, or merge repeated entries
 -- uniq' :: String -> String
@@ -183,7 +184,7 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat
 --
 -- -- wc roughly emulates the UNIX wc command
 -- wc' :: String -> String
@@ -192,4 +193,4 @@ id' = (cmd d f m j s) where
 --     f = id
 --     m = write
 --     j = id
---     s = unlines
+--     s = concat

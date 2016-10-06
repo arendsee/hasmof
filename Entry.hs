@@ -5,6 +5,11 @@ module Entry
     , Sequence(..)
     , readFasta
     , write
+    , etrans
+    , qtrans
+    , htrans
+    , wrap
+    , blank
 ) where
 
 import Data.List.Split
@@ -15,6 +20,7 @@ data Sequence = Sequence String | AA String | DNA String | RNA String deriving S
 
 data Entry = Entry Header Sequence deriving Show
 
+-- String to Object -------------------------------------------------
 class Parse a where
     parse :: String -> a
 
@@ -34,15 +40,13 @@ instance Parse Sequence where
      parse s = Sequence s
 
 
-writeEntry :: (Header -> String) -> (Sequence -> String) -> Entry -> String
-writeEntry f g (Entry h q) = f h ++ "\n" ++ g q
-
--- most simple write functions
+-- Object to String -------------------------------------------------
 class Write a where
     write :: a -> String
 
 instance Write Header where
-    write (Header i d) = ">" ++ i ++ " " ++ d
+    write (Header i "") = ">" ++ i
+    write (Header i d)  = ">" ++ i ++ " " ++ d
 
 instance Write Sequence where
     write (Sequence s) = wrap 60 s
@@ -50,23 +54,26 @@ instance Write Sequence where
 instance Write Entry where
     write (Entry d s)  = (write d) ++ "\n" ++ (write s)
 
--- header write alternatives
-write_header_clean :: Header -> String
-write_header_clean (Header i _) = ">" ++ i
 
--- sequence write alternatives
-write_seq_wrap :: Int -> Sequence -> String
-write_seq_wrap i (Sequence s) = wrap i s
+-- Transform functions ----------------------------------------------
+etrans :: (Header -> Header) -> (Sequence -> Sequence) -> Entry -> Entry
+etrans f g (Entry h q) = Entry (f h) (g q)
 
-write_seq_reverse :: Sequence -> String
-write_seq_reverse (Sequence s) = reverse s
+qtrans :: (String -> String) -> Sequence -> Sequence
+qtrans f (Sequence s) = Sequence (f s)
+
+htrans :: (String -> String) -> (String -> String) -> Header -> Header
+htrans f g (Header i d) = Header (f i) (g d)
 
 
+-- utilities --------------------------------------------------------
 wrap :: Int -> String -> String
 wrap _ [] = []
 wrap 0 s  = s
 wrap n s  = take n s ++ "\n" ++ wrap n (drop n s)
 
+blank :: String -> String
+blank _ = ""
 
 readFasta :: String -> [Entry]
 readFasta [] = []
