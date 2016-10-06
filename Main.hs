@@ -6,17 +6,17 @@ import System.Environment (getArgs)
 import Entry
 
 
--- Borrowed verbatim from Real World Haskell ------------------------
+-- Borrowed from Real World Haskell ---------------------------------
 interactWith function inputFile outputFile = do
   input <- readFile inputFile
   writeFile outputFile (function input)
 
-main = mainWith $ subcmd
+main = mainWith $ make_function
   where mainWith function = do
           args <- getArgs
           case args of
-            [input,output] -> interactWith function input output
-            _ -> putStrLn "error: exactly two arguments needed"
+            [cmd, input] -> interactWith (function cmd) input "/dev/stdout"
+            _ -> putStrLn "error: exactly 2 arguments needed"
 ---------------------------------------------------------------------
 
 cmd :: ( String  -> [Entry] ) ->    -- d divide          1 -> m
@@ -27,9 +27,13 @@ cmd :: ( String  -> [Entry] ) ->    -- d divide          1 -> m
        ( String  -> String  )       -- composition
 cmd d f m j s = (s . j . map m . f . d)
 
+-- parse an argument string to determine function
+make_function :: String -> (String -> String)
+make_function "id" = id' 
+
 -- A command that does nothing except resetting columns
-subcmd :: (String -> String)
-subcmd = (cmd d f m j s) where
+id' :: (String -> String)
+id' = (cmd d f m j s) where
     d = readFasta
     f = id
     m = write
