@@ -1,4 +1,5 @@
-TARGET=smof
+TARGET=hasmof
+FLAGS=
 
 all:
 	ghc -o ${TARGET} *.hs
