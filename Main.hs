@@ -3,7 +3,10 @@
 {-# LANGUAGE TypeFamilies #-}
 
 import System.Environment (getArgs)
+import Util
 import Entry
+import Header
+import Sequence
 
 
 -- Borrowed from Real World Haskell ---------------------------------
@@ -37,7 +40,7 @@ id' :: (String -> String)
 id' = (cmd d f m j s) where
     d = readFasta
     f = id
-    m = write
+    m = ewrite hshow qshow
     j = id
     s = concat 
 
@@ -46,7 +49,7 @@ reverse' :: String -> String
 reverse' = (cmd d f m j s) where
     d = readFasta
     f = id
-    m = (write . etrans id (qtrans reverse))
+    m = ewrite hshow qshow . etrans id (qtrans (wrap 60 . reverse))
     j = id
     s = concat
 
