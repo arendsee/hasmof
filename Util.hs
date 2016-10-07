@@ -1,7 +1,8 @@
 module Util
 (
-    wrap
+      wrap
     , blank
+    , cut
 ) where
 
 wrap :: Int -> String -> String
@@ -16,3 +17,12 @@ wrap n s
 
 blank :: String -> String
 blank _ = ""
+
+cut :: [Int] -> [a] -> [a]
+cut [] _ = []
+cut (x:xs) v
+    | n > i =  [v !! i] ++ cut xs v
+    | otherwise = error "No can do, sir!\n"
+    where
+        n = length(v)
+        i = x - 1

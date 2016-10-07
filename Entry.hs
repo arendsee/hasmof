@@ -1,11 +1,12 @@
 module Entry
 (
-    Entry(..)
+      Entry(..)
     , etrans
     , eread
     , eshow
     , ewrite
     , readFasta
+    , e2q
 ) where
 
 import Data.List.Split
@@ -28,6 +29,9 @@ etrans f g (Entry h q) = Entry (f h) (g q)
 
 ewrite :: (Header -> String) -> (Sequence -> String) -> Entry -> String
 ewrite f g (Entry h q) = (f h) ++ "\n" ++ (g q) ++ "\n"
+
+e2q :: (Sequence -> a) -> Entry -> a
+e2q f (Entry _ s) = f s
 
 readFasta :: String -> [Entry]
 readFasta [] = []

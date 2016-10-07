@@ -1,6 +1,6 @@
 module Header
 (
-    Header(..)	
+      Header(..)
     , htrans
     , hread
     , hshow

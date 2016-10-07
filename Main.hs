@@ -34,9 +34,13 @@ cmd d f m j s = (s . j . map m . f . d)
 make_function :: String -> (String -> String)
 make_function "id"      = id'
 make_function "reverse" = reverse'
+make_function "head"    = head'
+make_function "cut"     = cut'
+make_function "tail"    = tail'
+make_function "wc"      = wc'
 
 -- A command that does nothing except resetting columns
-id' :: (String -> String)
+id' :: String -> String
 id' = (cmd d f m j s) where
     d = readFasta
     f = id
@@ -53,16 +57,44 @@ reverse' = (cmd d f m j s) where
     j = id
     s = concat
 
+-- head writes the first sequences in a file
+head' :: String -> String
+head' x = (cmd d f m j s) x where
+    d = readFasta
+    f = take 1
+    m = ewrite hshow qshow
+    j = id
+    s = concat
+
+-- head writes the first sequences in a file
+tail' :: String -> String
+tail' x = (cmd d f m j s) x where
+    d = readFasta
+    f = (take 1 . reverse)
+    m = ewrite hshow qshow
+    j = id
+    s = concat
+
+-- select a given set of entries
+k=[1,3]
+cut' :: String -> String
+cut' x = (cmd d f m j s) x where
+    d = readFasta
+    f = cut k
+    m = ewrite hshow qshow
+    j = id
+    s = concat
+
+-- count sequences and total size
+wc' :: String -> String
+wc' x = (cmd d f m j s) x where
+    d = readFasta
+    f = id
+    m = e2q qlength
+    j = (\x -> (length x, sum x))
+    s = (\x -> (show . fst) x ++ "\t" ++ (show . snd) x ++ "\n")
+
 -- ----------- Smof subcommands ----------------------------------------
--- -- cut emulates UNIX cut command, where fields are entries
--- cut' :: String -> String
--- cut' x = (cmd d f m j s) x where
---     d = readFasta
---     f = id
---     m = write
---     j = id
---     s = concat
---
 -- -- clean cleans fasta files
 -- clean' :: String -> String
 -- clean' x = (cmd d f m j s) x where
@@ -95,15 +127,6 @@ reverse' = (cmd d f m j s) where
 -- md5sum' x = (cmd d f m j s) x where
 --     d = readFasta
 --     f = id
---     m = write
---     j = id
---     s = concat
---
--- -- head writes the first sequences in a file
--- head' :: String -> String
--- head' x = (cmd d f m j s) x where
---     d = readFasta
---     f = take 1
 --     m = write
 --     j = id
 --     s = concat
@@ -171,27 +194,9 @@ reverse' = (cmd d f m j s) where
 --     j = id
 --     s = concat
 --
--- -- tail writes the last sequences in a file
--- tail' :: String -> String
--- tail' x = (cmd d f m j s) x where
---     d = readFasta
---     f = id
---     m = write
---     j = id
---     s = concat
---
 -- -- uniq count, omit, or merge repeated entries
 -- uniq' :: String -> String
 -- uniq' x = (cmd d f m j s) x where
---     d = readFasta
---     f = id
---     m = write
---     j = id
---     s = concat
---
--- -- wc roughly emulates the UNIX wc command
--- wc' :: String -> String
--- wc' x = (cmd d f m j s) x where
 --     d = readFasta
 --     f = id
 --     m = write
