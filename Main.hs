@@ -40,7 +40,7 @@ make_function "head"    = head'
 make_function "cut"     = cut'
 make_function "tail"    = tail'
 make_function "wc"      = wc'
-{- make_function "sort"    = sort' -}
+make_function "sort"    = sort'
 make_function _         = error "Invalid subcommand name"
 
 -- A command that does nothing except resetting columns
@@ -98,13 +98,13 @@ wc' x = (cmd d f m j s) x where
     j = (\x -> (length x, sum x))
     s = (\x -> (show . fst) x ++ "\t" ++ (show . snd) x ++ "\n")
 
-{- sort' :: String -> String         -}
-{- sort' x = (cmd d f m j s) x where -}
-{-     d = readFasta                 -}
-{-     f = sort                      -}
-{-     m = ewrite fshow fshow        -}
-{-     j = id                        -}
-{-     s = concat                    -}
+sort' :: String -> String
+sort' x = (cmd d f m j s) x where
+    d = readFasta
+    f = sort
+    m = ewrite fshow fshow
+    j = id
+    s = concat
 
 -- ----------- Smof subcommands ----------------------------------------
 -- -- clean cleans fasta files
