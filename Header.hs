@@ -1,22 +1,28 @@
 module Header
 (
       Header(..)
-    , htrans
-    , hread
-    , hshow
+    , tHeader
 ) where
 
-data Header = Header String String
+import Classes
 
-hread :: String -> Header
-hread s = Header name desc where
-    w = words s
-    name = (unwords . take 1) w
-    desc = (unwords . drop 1) w
+data Header = Header String String deriving (Eq, Read, Show)
 
-hshow :: Header -> String
-hshow (Header i "") = ">" ++ i
-hshow (Header i d)  = ">" ++ i ++ " " ++ d
+instance Ord Header where
+    (<=) (Header i1 d1) (Header i2 d2)
+        | i1 <  i2  = True
+        | d1 <= d2  = True
+        | otherwise = False
 
-htrans :: (String -> String) -> (String -> String) -> Header -> Header
-htrans f g (Header i d) = Header (f i) (g d)
+instance FRead Header where
+    fread s = Header name desc where
+        w = words s
+        name = (unwords . take 1) w
+        desc = (unwords . drop 1) w
+
+instance FShow Header where
+    fshow (Header i "") = ">" ++ i
+    fshow (Header i d)  = ">" ++ i ++ " " ++ d
+
+tHeader :: (String -> String) -> (String -> String) -> Header -> Header
+tHeader f g (Header i d) = Header (f i) (g d)

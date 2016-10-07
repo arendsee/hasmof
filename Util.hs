@@ -15,7 +15,7 @@ wrap n s
         rhs = drop n s
         lhs = take n s
 
-blank :: String -> String
+blank :: a -> String
 blank _ = ""
 
 cut :: [Int] -> [a] -> [a]

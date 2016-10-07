@@ -1,22 +1,22 @@
 module Sequence
 (
       Sequence(..)
-    , qtrans
-    , qread
-    , qshow
+    , tSequence
     , qlength
 ) where
 
-data Sequence = Sequence String | AA String | DNA String | RNA String
+import Classes
 
-qread :: String -> Sequence
-qread s = Sequence s
+data Sequence = Sequence String | AA String | DNA String | RNA String deriving (Ord, Eq, Read, Show)
 
-qshow :: Sequence -> String
-qshow (Sequence s) = s
+instance FRead Sequence where
+    fread s = Sequence s
 
-qtrans :: (String -> String) -> Sequence -> Sequence
-qtrans f (Sequence s) = Sequence (f s)
+instance FShow Sequence where
+    fshow (Sequence s) = s
+
+tSequence :: (String -> String) -> Sequence -> Sequence
+tSequence f (Sequence s) = Sequence (f s)
 
 qlength :: Sequence -> Int
 qlength (Sequence s) = length(s)

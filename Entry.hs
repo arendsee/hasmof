@@ -1,9 +1,7 @@
 module Entry
 (
       Entry(..)
-    , etrans
-    , eread
-    , eshow
+    , tEntry
     , ewrite
     , readFasta
     , e2q
@@ -12,20 +10,27 @@ module Entry
 import Data.List.Split
 import Header
 import Sequence
+import Classes
 
-data Entry = Entry Header Sequence
+data Entry = Entry Header Sequence deriving (Eq, Read, Show)
 
-eread :: String -> Entry
-eread s = Entry header sequence where
-    ss = lines s
-    header   = (hread . concat . take 1) ss
-    sequence = (qread . concat . drop 1) ss
+instance Ord Entry where
+    (<=) (Entry h1 _) (Entry h2 _)
+        | h1 <= h2  = True
+        | otherwise = False
 
-eshow :: Entry -> String
-eshow (Entry d s)  = (hshow d) ++ "\n" ++ (qshow s)
+instance FRead Entry where
+    fread s = Entry header sequence where
+        ss = lines s
+        header   = (fread . concat . take 1) ss
+        sequence = (fread . concat . drop 1) ss
 
-etrans :: (Header -> Header) -> (Sequence -> Sequence) -> Entry -> Entry
-etrans f g (Entry h q) = Entry (f h) (g q)
+instance FShow Entry where
+    fshow (Entry d s) = (fshow d) ++ "\n" ++ (fshow s)
+
+-- A transform constructor that takes a function on each field
+tEntry :: (Header -> Header) -> (Sequence -> Sequence) -> Entry -> Entry
+tEntry f g (Entry h q) = Entry (f h) (g q)
 
 ewrite :: (Header -> String) -> (Sequence -> String) -> Entry -> String
 ewrite f g (Entry h q) = (f h) ++ "\n" ++ (g q) ++ "\n"
@@ -35,7 +40,7 @@ e2q f (Entry _ s) = f s
 
 readFasta :: String -> [Entry]
 readFasta [] = []
-readFasta xs = (map eread . splitRecords) xs where
+readFasta xs = (map fread . splitRecords) xs where
     -- This function is not quite correct, entries should be split only if '>' is
     -- at the beginning of the line. It is perfectly legal inside a header.
     splitRecords :: String -> [String]

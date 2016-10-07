@@ -3,10 +3,12 @@
 {-# LANGUAGE TypeFamilies #-}
 
 import System.Environment (getArgs)
+import Data.List (sort)
 import Util
 import Entry
 import Header
 import Sequence
+import Classes
 
 
 -- Borrowed from Real World Haskell ---------------------------------
@@ -18,8 +20,8 @@ main = mainWith $ make_function
   where mainWith function = do
           args <- getArgs
           case args of
-            [cmd, input] -> interactWith (function cmd) input "/dev/stdout"
-            _ -> putStrLn "error: exactly 2 arguments needed"
+            [cmd] -> interactWith (function cmd) "/dev/stdin" "/dev/stdout"
+            _ -> putStrLn "error: exactly 1 arguments needed"
 ---------------------------------------------------------------------
 
 cmd :: ( String  -> [Entry] ) ->    -- d divide          1 -> m
@@ -38,13 +40,15 @@ make_function "head"    = head'
 make_function "cut"     = cut'
 make_function "tail"    = tail'
 make_function "wc"      = wc'
+{- make_function "sort"    = sort' -}
+make_function _         = error "Invalid subcommand name"
 
 -- A command that does nothing except resetting columns
 id' :: String -> String
 id' = (cmd d f m j s) where
     d = readFasta
     f = id
-    m = ewrite hshow qshow
+    m = ewrite fshow fshow
     j = id
     s = concat 
 
@@ -53,7 +57,7 @@ reverse' :: String -> String
 reverse' = (cmd d f m j s) where
     d = readFasta
     f = id
-    m = ewrite hshow qshow . etrans id (qtrans (wrap 60 . reverse))
+    m = ewrite fshow fshow . tEntry id (tSequence (wrap 60 . reverse))
     j = id
     s = concat
 
@@ -62,7 +66,7 @@ head' :: String -> String
 head' x = (cmd d f m j s) x where
     d = readFasta
     f = take 1
-    m = ewrite hshow qshow
+    m = ewrite fshow fshow
     j = id
     s = concat
 
@@ -71,7 +75,7 @@ tail' :: String -> String
 tail' x = (cmd d f m j s) x where
     d = readFasta
     f = (take 1 . reverse)
-    m = ewrite hshow qshow
+    m = ewrite fshow fshow
     j = id
     s = concat
 
@@ -81,7 +85,7 @@ cut' :: String -> String
 cut' x = (cmd d f m j s) x where
     d = readFasta
     f = cut k
-    m = ewrite hshow qshow
+    m = ewrite fshow fshow
     j = id
     s = concat
 
@@ -93,6 +97,14 @@ wc' x = (cmd d f m j s) x where
     m = e2q qlength
     j = (\x -> (length x, sum x))
     s = (\x -> (show . fst) x ++ "\t" ++ (show . snd) x ++ "\n")
+
+{- sort' :: String -> String         -}
+{- sort' x = (cmd d f m j s) x where -}
+{-     d = readFasta                 -}
+{-     f = sort                      -}
+{-     m = ewrite fshow fshow        -}
+{-     j = id                        -}
+{-     s = concat                    -}
 
 -- ----------- Smof subcommands ----------------------------------------
 -- -- clean cleans fasta files
@@ -152,15 +164,6 @@ wc' x = (cmd d f m j s) x where
 -- -- sniff extract info about the sequence
 -- sniff' :: String -> String
 -- sniff' x = (cmd d f m j s) x where
---     d = readFasta
---     f = id
---     m = write
---     j = id
---     s = concat
---
--- -- sort sort sequences
--- sort' :: String -> String
--- sort' x = (cmd d f m j s) x where
 --     d = readFasta
 --     f = id
 --     m = write
