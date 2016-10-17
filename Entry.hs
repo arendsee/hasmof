@@ -32,6 +32,12 @@ instance FShow Entry where
 tEntry :: (Header -> Header) -> (Sequence -> Sequence) -> Entry -> Entry
 tEntry f g (Entry h q) = Entry (f h) (g q)
 
+-- instance Applicative Entry where
+--     pure = \h q -> Entry h q
+--     (<*>) = [f
+
+
+
 ewrite :: (Header -> String) -> (Sequence -> String) -> Entry -> String
 ewrite f g (Entry h q) = (f h) ++ "\n" ++ (g q) ++ "\n"
 
